@@ -3,8 +3,10 @@
 #include <SoftwareSerial.h>
 #include "LT_SPI.h"
 #include "LTC68041.h"
+#include "funcione.h"
 
 const uint8_t TOTAL_IC = 1;//!<number of ICs in the daisy chain
+const uint8_t debug_mode = 1;//para imprimir por serial tengase a 1
 
 /******************************************************
  *** Global Battery Variables received from 6804 commands
@@ -48,19 +50,8 @@ const uint8_t TOTAL_IC = 1;//!<number of ICs in the daisy chain
  /*!***********************************
  \brief Initializes the configuration array
  **************************************/
-void init_cfg()
-{
-  for (int i = 0; i<TOTAL_IC; i++)
-  {
-    tx_cfg[i][0] = 0xFE;
-    tx_cfg[i][1] = 0x00 ;
-    tx_cfg[i][2] = 0x00 ;
-    tx_cfg[i][3] = 0x00 ;
-    tx_cfg[i][4] = 0x00 ;
-    tx_cfg[i][5] = 0x00 ;
-  }
 
-}
+
 
 
 void setup() {
