@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <SoftwareSerial.h>
-//#include <SPI.h>
 #include "LT_SPI.h"
 #include "UserInterface.h"
 #include "LTC68042.h"
