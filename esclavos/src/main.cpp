@@ -2,9 +2,8 @@
 #include <stdint.h>
 #include <SoftwareSerial.h>
 #include "LT_SPI.h"
-#include "UserInterface.h"
-#include "LTC68042.h"
-#include "Average.h"
+#include "LTC68041.h"
+
 
 
 
