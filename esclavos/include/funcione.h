@@ -1,16 +1,13 @@
-
-
 #include <Arduino.h>
 #include <stdint.h>
 #include <SoftwareSerial.h>
 #include "LT_SPI.h"
 #include "LTC68041.h"
 
-
 /*!***********************************
 \brief Initializes the configuration array
 **************************************/
-void init_cfg (uint8_t TOTAL_IC, uint8_t tx_cfg[1][6] )
+void init_cfg()
 {
   for (int i = 0; i<TOTAL_IC; i++)
   {
@@ -23,24 +20,32 @@ void init_cfg (uint8_t TOTAL_IC, uint8_t tx_cfg[1][6] )
   }
 }
 
-void write_config (uint8_t TOTAL_IC,uint8_t tx_cfg[1][6])
+void write_config (TOTAL_IC,tx_cfg)
 {
   wakeup_sleep();
   LTC6804_wrcfg(TOTAL_IC,tx_cfg);
 }
 
-void read_config(uint8_t TOTAL_IC,uint8_t rx_cfg[1][8])
+void read_config(TOTAL_IC,rx_cfg)
 {
   wakeup_sleep();
-  error = LTC6804_rdcfg();
+  error = LTC6804_rdcfg(TOTAL_IC,rx_cfg);
   if (error == -1)
   {
     Serial.println("A PEC error was detected in the received data");
   }
 }
 
+void start_adc_conv ()
+{
+  wakeup_sleep();
+  LTC6804_adcv();
+  delay(3);
+  Serial.println("cell conversion completed");
+  Serial.println();
+}
 
-void read_cell_voltage (uint8_t TOTAL_IC,uint16_t cell_codes[1][12])
+void read_cell_voltage ()
 {
   wakeup_sleep();
   error = LTC6804_rdcv(0, TOTAL_IC,cell_codes); // Set to read back all cell voltage registers
@@ -48,12 +53,12 @@ void read_cell_voltage (uint8_t TOTAL_IC,uint16_t cell_codes[1][12])
   {
     Serial.println("A PEC error was detected in the received data");
   }
-
+  print_cells();
 }
 
 
 
-void print_config(uint8_t TOTAL_IC,uint8_t tx_cfg[1][6])
+void print_config()
 {
   int cfg_pec;
 
@@ -85,7 +90,7 @@ void print_config(uint8_t TOTAL_IC,uint8_t tx_cfg[1][6])
   Serial.println();
 }
 
-void print_cells(uint8_t TOTAL_IC,uint16_t cell_codes[1][12])
+void print_cells()
 {
 
 
@@ -106,7 +111,7 @@ void print_cells(uint8_t TOTAL_IC,uint16_t cell_codes[1][12])
   Serial.println();
 }
 
-void print_config(uint8_t TOTAL_IC,uint8_t tx_cfg[1][6])
+void print_config()
 {
   int cfg_pec;
 
@@ -138,7 +143,7 @@ void print_config(uint8_t TOTAL_IC,uint8_t tx_cfg[1][6])
   Serial.println();
 }
 
-void print_rxconfig(uint8_t TOTAL_IC,uint8_t rx_cfg[1][8])
+void print_rxconfig()
 {
   Serial.println("Received Configuration ");
   for (int current_ic=0; current_ic<TOTAL_IC; current_ic++)
@@ -162,7 +167,7 @@ void print_rxconfig(uint8_t TOTAL_IC,uint8_t rx_cfg[1][8])
     Serial.print(", 0x");
     serial_print_hex(rx_cfg[current_ic][7]);
     Serial.println();
-  }
+}
   Serial.println();
 }
 
