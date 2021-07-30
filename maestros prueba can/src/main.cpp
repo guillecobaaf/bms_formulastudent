@@ -44,6 +44,9 @@ void setup() {
   CANbus0.begin();
   CANbus1.begin();
   delay(1000);
+  Serial.begin(9600);
+  pinMode(13,OUTPUT);
+  digitalWrite(13,HIGH);
   Serial.println("Can Receiver Initialized");
 
   //inicializamos la sd
@@ -61,6 +64,11 @@ void setup() {
 
 void loop()
 {
+
+  Serial.println("zorra");
+  digitalWrite(13,LOW);
+  delay(100);
+  digitalWrite(13,HIGH);
   if(CANbus0.available())
   {
     CANbus0.read(msg);
