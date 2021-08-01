@@ -19,6 +19,7 @@ void setup() {
     }
 
 
+
   }
 
 
@@ -30,18 +31,22 @@ void loop() {
   digitalWrite(13,LOW);
   delay(1000);
   Serial.printf("sip");
+
+
   myFile = SD.open("test.txt",FILE_WRITE);
 
   if(myFile){
     Serial.print("Writing to test.txt...");
-      uint_8t guarda = msg.buf;
-      myFile.println(guarda);
+      myFile.println("sipe");
       myFile.println("\n");
       // close the file:
       myFile.close();
       Serial.println("done.");
 
 
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
   }
 
   // put your main code here, to run repeatedly:
