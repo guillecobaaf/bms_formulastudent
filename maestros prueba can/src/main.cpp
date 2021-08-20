@@ -8,8 +8,8 @@
 
 //definimos las variable para can bus
 
-FlexCAN CANbus0(1000000, 0);
-FlexCAN CANbus1(1000000, 1);
+FlexCAN CANbus(1000000, 0);
+;
 
 static CAN_message_t msg;
 static uint8_t hex[17] = "0123456789abcdef";
@@ -41,8 +41,8 @@ File myFile;
 void setup() {
   // put your setup code here, to run once:
   //init can bus
-  CANbus0.begin();
-  CANbus1.begin();
+  CANbus.begin();
+
   delay(1000);
   Serial.begin(9600);
   pinMode(13,OUTPUT);
@@ -65,46 +65,52 @@ void setup() {
 void loop()
 {
 
-  Serial.println("zorra");
-  digitalWrite(13,LOW);
-  delay(100);
-  digitalWrite(13,HIGH);
-  if(CANbus0.available())
-  {
-    CANbus0.read(msg);
-//    Serial.print("CAN bus 0: "); hexDump(8, msg.buf);
-  CANbus1.write(msg);
-myFile = SD.open("test.txt",FILE_WRITE);
-if(myFile){
-  Serial.print("Writing to test.txt...");
-    uint8_t guarda = msg.buf;
-    myFile.println(guarda);
-    myFile.println("\n");
-    // close the file:
-    myFile.close();
-    Serial.println("done.");
 
-
-}
-  }
-
-  if(CANbus1.available())
+    digitalWrite(13,LOW);
+    delay(100);
+    digitalWrite(13,HIGH);
+    if(CANbus.available())
     {
-      CANbus1.read(msg);
-  //    Serial.print("CAN bus 1: "); hexDump(8, msg.buf);
-      CANbus0.write(msg);
+      CANbus.read(msg);
+  //    Serial.print("CAN bus 0: "); hexDump(8, msg.buf);
+
       myFile = SD.open("test.txt",FILE_WRITE);
       if(myFile){
         Serial.print("Writing to test.txt...");
-          uint8_t guarda = msg.buf;
-          myFile.println(guarda);
+          //imprimo el id del mensaje
+          myFile.println(int(msg.id),HEX);
+          myFile.println(" ");
+          /*imprimo el buf 1 en el que se dira que tipo de dato es
+            *01 Datos de voltaje
+            *02 Datos de Temperatura
+          */
+          myFile.println(int(msg.buf[1]));
+          /* en el buf 2 ira reflejado la posicion del termistor o de la celda
+            en la que se mide la temperatura o el voltaje con el fin de poder
+            reflejarla por serial y guardarlo en los datos de la SD
+
+          */
+
+          myFile.println(" ");
+          myFile.println(int(msg.buf[2]));
+
+          /* en el buf 3 se guardara los valores mencionados*/
+
+          myFile.println(" ");
+          myFile.println(int(msg.buf[3]));
+
           myFile.println("\n");
           // close the file:
           myFile.close();
-          Serial.println("done.");
-
-
-      }
-
+          Serial.println("se ha guardado:\n ");
+            Serial.println(int(msg.buf[1]));
+            Serial.println(" ");
+            Serial.println(int(msg.buf[2]));
+            Serial.println(" ");
+            Serial.println(int(msg.buf[3]));
+            Serial.println("\n");
+        }
     }
+
+
   }
