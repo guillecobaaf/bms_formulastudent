@@ -38,6 +38,16 @@ float minV1 ;
 float maxV1 ;
 int cellmax[]={0,0};//en la posicion 1 se almacena el numero de la celda
                     //en la posicion 2 se almacena el valor del voltaje
+
+int cellmin[]={0,100};//en la posicion 1 se almacena el numero de la celda
+                    //en la posicion 2 se almacena el valor del voltaje
+int diferencialimite=0;//diferencia a la que se empieza a balancear
+int diferenciamax=0;//diferenciamax actual
+int diferencia=0;//diferencia actual de voltaje
+int balancear[]={0,0,0,0,0,0,0,0,0,0,0,0};//matriz que dice si se debe balancear una celda o no
+//si esta a 1 se balancea
+//si esta a 0 no
+
 /******************************************************
   Global Battery Variables received from 6804 commands
   These variables store the results from the LTC6804
@@ -151,8 +161,15 @@ for(int i=0;i<=12;i++){
 }
 //BALANCEO DE CELDAS
 // sacamos las celdas de menor voltaje y mayor voltaje
-
-
+mayor(cell_codes,cellmax);
+menor(cell_codes,cellmin);
+diferenciamax=cellmax[2]-cellmin[2];
+/*si la diferencia max leida es mayor que la limite se mira si hay mas celdas
+que balancear*/
+if(diferenciamax>diferencialimite){
+balanceo(cell_codes,balancear,cellmin);
+  }
+//una vez sabido que celdas hay que balancear se manda
 
 }
 
