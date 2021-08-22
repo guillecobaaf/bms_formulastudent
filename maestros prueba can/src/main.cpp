@@ -63,7 +63,7 @@ void setup() {
 
   }
   Serial.println("initialization done");
-
+//FALTA INICIALIZAR MODOS DE PINES
 
 
 }
