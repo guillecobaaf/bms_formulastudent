@@ -9,7 +9,7 @@ switch (buf0)
 {
 /*ejecuta comprobacion de temperatura y decide si cortar o no y cuando y como
 activar los ventiladores por la señal pwm*/
-case 1:
+case 2:
     if (buf2>=tvent1&&buf2<=tvent2){
 
       analogWrite(pinpwm,vvent*25);
@@ -25,7 +25,7 @@ case 1:
       digitalWrite(disenable, HIGH);
 
     }
-case 2:
+case 1:
   if(buf2<vmin){
 
     digitalWrite(disenable,HIGH);
@@ -113,5 +113,46 @@ switch(estado)
 
       }
 }
+
+}
+
+//calculo del estado de la carga
+float soc (uint8_t msg0,uint8_t msg2,float intern_resistance, float corriente,float prev_soc){
+
+
+if(msg0==1){
+
+
+
+
+
+float ocv= (float)msg2*0.0001 + corriente*intern_resistance;
+
+/*Ajuste a curva obtenida experomentalmente para calcular el estado de la carga
+en funcion de la tension en circuito abierto*/
+  float     x  =         ocv  ;
+  float     p1 =      -15.94  ;
+  float     p2 =       481.8  ;
+  float     p3 =       -6447  ;
+  float     p4 =   5.013e+04  ;
+  float     p5 =  -2.496e+05  ;
+  float     p6 =   8.254e+05  ;
+  float     p7 =  -1.813e+06  ;
+  float     p8 =   2.549e+06  ;
+  float     p9 =  -2.083e+06  ;
+  float     p10 =   7.539e+05 ;
+
+
+float estado_carga = p1*pow(x,9) + p2*pow(x,8) + p3*pow(x,7) + p4*pow(x,6) + p5*pow(x,5) + p6*pow(x,4) + p7*pow(x,3) + p8*pow(x,2) + p9*x + p10;
+
+
+
+return estado_carga;
+}else{
+
+return prev_soc;
+
+}
+
 
 }

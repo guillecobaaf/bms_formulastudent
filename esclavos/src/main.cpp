@@ -18,7 +18,7 @@ FlexCAN CANbus(1000000, 0);
 ;
 
 static CAN_message_t msg;
-static uint8_t hex[17] = "0123456789abcdef";
+
 
 //CONFIGURACION DEL LTC68041
 #define TOTAL_IC  1            // Number of ICs in the isoSPI network LTC6804-2 ICs must be addressed in ascending order starting at 0.
@@ -44,9 +44,21 @@ int cellmin[]={0,100};//en la posicion 1 se almacena el numero de la celda
 int diferencialimite=0;//diferencia a la que se empieza a balancear
 int diferenciamax=0;//diferenciamax actual
 int diferencia=0;//diferencia actual de voltaje
-int balancear[]={0,0,0,0,0,0,0,0,0,0,0,0};//matriz que dice si se debe balancear una celda o no
+uint16_t balancear=0;// si se debe balancear una celda o no
 //si esta a 1 se balancea
 //si esta a 0 no
+uint16_t vuv=2.6;
+uint16_t vov=4.1;
+//variables para las temperaturas
+float temps[35];
+float coefB=3740;
+float coefA=0.16655;
+float r25=47000;
+//nombre de los pines
+int analog[]={A0,A1,A2,A3,A4,A5};
+int control1[]={17,16,15,14};
+int control2[]={18,19,20,21};
+
 
 /******************************************************
   Global Battery Variables received from 6804 commands
@@ -103,7 +115,12 @@ int balancear[]={0,0,0,0,0,0,0,0,0,0,0,0};//matriz que dice si se debe balancear
   void serial_print_hex(uint8_t data);
 
 void setup() {
-//FALTA INICIALIZAR MODOS DE PINES
+//inicializamos los pines
+for(int i=0;i<4;i++){
+  pinMode(control1[i],OUTPUT);
+  pinMode(control2[i],OUTPUT);
+}
+
  Serial.begin(9600);
  CANbus.begin();
  delay(1000);
@@ -122,6 +139,7 @@ void setup() {
  //INICIALIZAMOS EL LTC68041
  LTC6804_initialize();
  init_cfg();
+ config_vlimites(tx_cfg,vuv,vov);
  delay(1000);
 }
 
@@ -167,9 +185,23 @@ diferenciamax=cellmax[2]-cellmin[2];
 /*si la diferencia max leida es mayor que la limite se mira si hay mas celdas
 que balancear*/
 if(diferenciamax>diferencialimite){
-balanceo(cell_codes,balancear,cellmin);
+balanceo(cell_codes,balancear,diferencialimite,cellmin,CELL_BALANCE_THRESHOLD_V);
   }
-//una vez sabido que celdas hay que balancear se manda
+//una vez sabido que celdas hay que balancear se carga en los bits de config
+control_balanceo(tx_cfg,balancear);
+//ESCRIBIMOS TODA LA CONFIGURACION CARGADA
+LTC6804_wrcfg(TOTAL_IC, tx_cfg);
+//leemos todas las temperaturas
+temperaturas(temps,coefA,coefB,r25);
+//mandamos por el bus las temperaturas
+msg.buf[0]=2;
+for(int i=0; i<36;i++){
+    msg.buf[1]=i;
+    msg.buf[2]=(uint8_t)temps[i];
+    if(CANbus.available()){
+      CANbus.write(msg);
+    }
+  }
 
 }
 

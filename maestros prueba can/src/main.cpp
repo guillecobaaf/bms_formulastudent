@@ -5,6 +5,7 @@
 #include <SPI.H>
 #include <string.h>
 #include <funciones.h>
+#include <math.h>
 //definimos la funciones
 void casos (int buf0,float buf2,int tvent1, int tvent2,int tcort,int pinpwm,int chenable,int disenable,float vmin,float vmax);
 //definimos las variable para can bus
@@ -38,7 +39,11 @@ float corrientedch = 10;//corriente maxima de descarga
 float vmin = 2.5; //voltaje minimo para la celda
 float vmax = 4.1; //voltaje maximo para la celda
 int vvent=3;
+float intern_resis=0.06;//valor calculado previamente a montar el pack
+float prev_soc=1;
 //varibles generales
+float c=0;
+float carga;
 
 int sip=0;
 
@@ -63,8 +68,10 @@ void setup() {
 
   }
   Serial.println("initialization done");
-//FALTA INICIALIZAR MODOS DE PINES
-
+//inicializamos los pines
+pinMode(pinpwm,OUTPUT);
+pinMode(chenable,OUTPUT);
+pinMode(disenable,OUTPUT);
 
 }
 
@@ -76,9 +83,14 @@ void loop()
     delay(1000);
     digitalWrite(13,HIGH);
     delay(1000);
+    c=corriente(A8,A7);
+    docurrent(chenable,disenable,corrientech,corrientedch,c);
+
     if(CANbus.available())
     {
       CANbus.read(msg);
+      prev_soc=carga;
+      carga=soc(msg.buf[0],msg.buf[2],intern_resis,c,prev_soc);
   //    Serial.print("CAN bus 0: "); hexDump(8, msg.buf);
   myFile = SD.open("test.txt",FILE_WRITE);
 
@@ -108,6 +120,9 @@ void loop()
       myFile.printf("%f",float(msg.buf[2]));
 
       myFile.printf("\n");
+      myFile.printf("%f A",c);
+      myFile.printf("\n");
+      myFile.printf("%f soc\n",carga);
       // close the file:
       myFile.close();
       Serial.println("se ha guardado:\n ");
