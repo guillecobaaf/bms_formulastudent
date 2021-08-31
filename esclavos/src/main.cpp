@@ -144,10 +144,10 @@ for(int i=0;i<4;i++){
 }
 
 void loop() {
-  digitalWrite(13,LOW);
-  delay(1000);
   digitalWrite(13,HIGH);
-  delay(1000);
+
+
+
 
 //LEEMOS LOS VOLTAJES DE LAS CELDAS
 wakeup_idle();
@@ -175,24 +175,38 @@ for(int i=0;i<=12;i++){
     Serial.println(int(msg.buf));
     Serial.println("\n");
 
+  }else{
+    Serial.printf("bus no disponible %d\n",i);
   }
 }
 //BALANCEO DE CELDAS
 // sacamos las celdas de menor voltaje y mayor voltaje
+Serial.println("sip1");
 mayor(cell_codes,cellmax);
+Serial.println("sip2");
 menor(cell_codes,cellmin);
+Serial.println("sip3");
 diferenciamax=cellmax[2]-cellmin[2];
+Serial.println("sip4");
 /*si la diferencia max leida es mayor que la limite se mira si hay mas celdas
 que balancear*/
 if(diferenciamax>diferencialimite){
 balanceo(cell_codes,balancear,diferencialimite,cellmin,CELL_BALANCE_THRESHOLD_V);
   }
+  Serial.println("sip5");
 //una vez sabido que celdas hay que balancear se carga en los bits de config
 control_balanceo(tx_cfg,balancear);
+Serial.println("sip6");
 //ESCRIBIMOS TODA LA CONFIGURACION CARGADA
+Serial.println("sip7");
+wakeup_idle();
+Serial.println("sip8");
 LTC6804_wrcfg(TOTAL_IC, tx_cfg);
+Serial.println("sip9");
 //leemos todas las temperaturas
 temperaturas(temps,coefA,coefB,r25);
+Serial.println("sip10");
+digitalWrite(13,LOW);
 //mandamos por el bus las temperaturas
 msg.buf[0]=2;
 for(int i=0; i<36;i++){
@@ -201,8 +215,11 @@ for(int i=0; i<36;i++){
     if(CANbus.available()){
       CANbus.write(msg);
     }
+    else{
+      Serial.printf("bus no disponible %d\n",i);
+    }
   }
-
+Serial.println("sip11");
 }
 
 

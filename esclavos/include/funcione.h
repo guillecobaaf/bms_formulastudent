@@ -107,7 +107,7 @@ for (int i=4;i<20;i++){
             digitalWrite(control1[2],l);
               for(int m=0;m<2;m++){
                   digitalWrite(control1[3],m);
-                    delay(100);
+                  
                   temps[i]=analogRead(analog[0])/1024 * 3.3;
               }
           }
@@ -124,7 +124,7 @@ for (int i=20;i<36;i++){
             digitalWrite(control2[2],l);
               for(int m=0;m<2;m++){
                   digitalWrite(control2[3],m);
-                    delay(100);
+
                   temps[i]=analogRead(analog[1])/1024 * 3.3;
               }
           }
